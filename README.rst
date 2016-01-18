@@ -5,13 +5,13 @@ Aldjemy
 Base
 ----
 
-Small package for integration SQLAlchemy into an existent Django project.
-The primary use case of this package is building complex queries that are
-not possible with the Django ORM.
+This is a small package to integrate SQLAlchemy into an existing Django
+project.  The primary use case of this package is building complex queries that
+are not possible with the Django ORM.
 
-You need to include aldjemy at the end of `INSTALLED_APPS`. When models are
-imported, aldjemy will read all models and contribute `sa` attribute to them.
-`sa` attribute is a class, mapped to Table class.
+You need to include aldjemy at the end of ``INSTALLED_APPS``. When models are
+imported, aldjemy will read all models and add an ``sa`` attribute to them.
+The ``sa`` attribute is a class, mapped to a SQLAlchemy ``Table``.
 
 Internally, aldjemy generates tables from Django models. This is an important
 distinction from the standard decision of using SQLAlchemy reflection.
@@ -24,9 +24,9 @@ M2M sample::
 
     User.sa.query().join(User.sa.groups).filter(Group.sa.name=="GROUP_NAME")
 
-Explicit joins is part of SQLAlchemy philosophy, so aldjemy can't get you exactly
-the same experience as Django.
-But aldjemy is not positioned as Django ORM drop-in replacement. It's a helper for special situations.
+Explicit joins are part of SQLAlchemy philosophy, so aldjemy can't get you
+exactly the same experience as Django.  But aldjemy is not positioned as a
+Django ORM drop-in replacement. It's a helper for special situations.
 
 We have some stuff in the aldjemy cache too::
 
@@ -34,32 +34,36 @@ We have some stuff in the aldjemy cache too::
     core.Cache.models # All generated models
     core.get_tables() # All tables, and M2M tables too
 
-You can use this stuff if you need - maybe you want to build queries with tables, or something like this.
+You can use this stuff if you need - maybe you want to build queries with
+tables, or something like this.
 
 
 Settings
 --------
 
 You can add your own field types to map django types to sqlalchemy ones with
-``ALDJEMY_DATA_TYPES`` settings parameter.  
-Parameter must be a ``dict``, key is result of ``field.get_internal_type()``,
-value must be a one arg function. You can get idea from ``aldjemy.types``.
+the ``ALDJEMY_DATA_TYPES`` setting.  It must be a ``dict``. Keys are the result
+of ``field.get_internal_type()``, values must be a one arg function.  For
+examples, look at the source of the  ``aldjemy.types`` module.
   
-Also it is possible to extend/override list of supported SQLALCHEMY engines
-using ``ALDJEMY_ENGINES`` settings parameter.  
-Parameter should be a ``dict``, key is substring after last dot from 
-Django database engine setting (e.g. ``sqlite3`` from ``django.db.backends.sqlite3``),
-value is SQLAlchemy driver which will be used for connection (e.g. ``sqlite``, ``sqlite+pysqlite``).
-It could be helpful if you want to use ``django-postgrespool``.
+Also it is possible to extend/override the list of supported SQLALCHEMY engines
+using the ``ALDJEMY_ENGINES`` setting.  It should be a ``dict``.  The keys are
+the substring after the last dot from the Django database engine setting (e.g.
+``sqlite3`` from ``django.db.backends.sqlite3``), values are the SQLAlchemy
+driver which will be used for that connection (e.g. ``sqlite``,
+``sqlite+pysqlite``).  It could be helpful if you want to use
+``django-postgrespool``.
 
 
 Mixins
 ------
 
-Often django models have helper function and properties that helps to
-represent the model's data (`__unicode__`), or represent some model based logic.
+Often, Django models have helper functions and properties that help to
+represent the model's data (``__unicode__``), or represent some model based
+logic.
 
-To integrate it with aldjemy models you can put these methods into a separate mixin::
+To integrate them with aldjemy models you can put these methods into a separate
+mixin::
 
     class TaskMixin(object):
         def __unicode__(self):
@@ -69,12 +73,11 @@ To integrate it with aldjemy models you can put these methods into a separate mi
         aldjemy_mixin = TaskMixin
         code = models.CharField(_('code'), max_length=32, unique=True)
 
-Voilà! You can use `unicode` on aldjemy classes, because this mixin will be
-mixed into generated aldjemy model.
+Voilà! You can use ``unicode`` on aldjemy classes, because this mixin will be
+mixed into the generated aldjemy model.
 
-If you want to expose all methods and properties without creating a
-separate mixin class, you can use the `aldjemy.meta.AldjemyMeta`
-metaclass::
+If you want to expose all methods and properties without creating a separate
+mixin class, you can use the ``aldjemy.meta.AldjemyMeta`` metaclass::
 
     from aldjemy.meta import AldjemyMeta
 
